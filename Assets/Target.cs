@@ -60,4 +60,49 @@ public class Target : MonoBehaviour
             }
         }
     }
+
+    void Update()
+    {
+        if (m_nState == eState.kCaught) //If target is caught, do nothing
+            return;
+
+        float distToPlayer = Vector3.Distance(transform.position, m_player.transform.position); //Calculating the distance between the player and the target
+        switch (m_nState) //State Machine
+        {
+            case eState.kIdle:
+            {
+                if (distToPlayer < m_fScaredDistance) //If the player is too close, start the hop 
+                {
+                    m_nState = eState.kHopStart;
+                }
+                break;
+            }
+
+            case eState.kHopStart:
+            {
+                Vector3 d = (transform.position - m_player.transform.position).normalized; //Determine the direction away from the player
+                m_vHopStartPos = transform.position; //Store the starting position of the hop
+                m_vHopEndPos = transform.position + d * m_fHopSpeed * m_fHopTime; //Calculate the hop end position
+                m_fHopStart = Time.time; //Record when the hop started
+                m_nState = eState.kHop; //Transition to hopping state
+                break;
+            }
+
+            case eState.kHop:
+            {
+                float t = (Time.time - m_fHopStart) / m_fHopTime; //Hop progress
+
+                if (t >= 1.0f)
+                {
+                    transform.position = m_vHopEndPos; //Hop is done, go to end position
+                    m_nState = eState.kIdle; //Return to being idle
+                }
+                else
+                {
+                    transform.position = Vector3.Lerp(m_vHopStartPos, m_vHopEndPos, t);
+                }
+                break;
+            }
+        }
+    }
 }
