@@ -169,6 +169,7 @@ public class Player : MonoBehaviour
             {
                 if (Time.time - m_fDiveStartTime >= m_fDiveRecoveryTime) //Wait until the recovery time is finished
                 {
+                    m_fSpeed = 0.0f; //Reset speed after dive, force acceleration
                     m_nState = eState.kMoveSlow; //Transition back to slow state
                 }
                 break;

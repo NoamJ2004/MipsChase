@@ -61,6 +61,18 @@ public class Target : MonoBehaviour
         }
     }
 
+    Vector3 ClampToScreen(Vector3 pos) //Added to prevent target from going off screen
+    {
+        Vector3 min = Camera.main.ViewportToWorldPoint(new Vector3(0, 0, 0));
+        Vector3 max = Camera.main.ViewportToWorldPoint(new Vector3(1, 1, 0));
+
+        pos.x = Mathf.Clamp(pos.x, min.x, max.x);
+        pos.y = Mathf.Clamp(pos.y, min.y, max.y);
+
+        return pos;
+    }
+
+
     void Update()
     {
         if (m_nState == eState.kCaught) //If target is caught, do nothing
@@ -82,7 +94,8 @@ public class Target : MonoBehaviour
             {
                 Vector3 d = (transform.position - m_player.transform.position).normalized; //Determine the direction away from the player
                 m_vHopStartPos = transform.position; //Store the starting position of the hop
-                m_vHopEndPos = transform.position + d * m_fHopSpeed * m_fHopTime; //Calculate the hop end position
+                Vector3 e = transform.position + d * m_fHopSpeed * m_fHopTime; //Calculate the hop end position
+                m_vHopEndPos = ClampToScreen(e);
                 m_fHopStart = Time.time; //Record when the hop started
                 m_nState = eState.kHop; //Transition to hopping state
                 break;
